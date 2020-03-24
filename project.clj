@@ -1,4 +1,4 @@
-(defproject b18 "0.1.0-SNAPSHOT"
+(defproject b19 "0.1.0-SNAPSHOT"
     :description "B19"
     :url "https://github.com/Viritystila/b19"
     :license {:name "The Unlicense"
