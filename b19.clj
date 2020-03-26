@@ -106,6 +106,7 @@
   (trg :markorona smp
        :in-trg
        (->   t_txt
+             (#(first %))
              )
        :in-loop
        (-> (rep [0] 8)
@@ -127,7 +128,7 @@
             )
        )
 
-  (volume! :markorona 2.75)
+  (volume! :markorona 1.075)
 
   (trg! :markorona :markoronae trg-fx-echo
         :in-amp ;(evr 6 [1] (rep 32 [0]))
@@ -162,9 +163,40 @@
 ;;End Markorona
 ;;;;;;;;;;;;;;;;
 
+(defn asc_2 [coll n input & args]
+  ;(println coll)
+  (let [is_n_vec      (vector? n)
+        isfn          (fn? input)
+
+        coll_length   (count coll)
+        max_n         (if is_n_vec
+                        (mod (apply max n) (+ 1 coll_length))
+                        (mod n (+ 1 coll_length)))
+
+        nth_element   (nth coll (mod max_n coll_length))
+        input         (if isfn (apply input (conj args nth_element)) input)
+        is_input_vec  (vector? input)
+        bothvec       (and is_n_vec is_input_vec)
+        min_length    (if bothvec
+                        (min (count n) (count input))
+                        0)
+        nmap          (if is_n_vec
+                        (map (fn [x] (mod x (+ 1 coll_length))) n)
+                       n)
+        ]
+    (if bothvec
+      (apply assoc coll (interleave nmap input) )
+      (assoc coll max_n input))
+    ))
+
 ;;;;;;;;;;;;
 ;;;tb303sn
 ;;;;;;;;;;;
+
+(println (map find-note-name (chord :d2 :7sus2)))
+
+(def d_7sus2 )
+
 (do
   (trg :tb303sn tb303)
 
@@ -173,34 +205,39 @@
   (trg :tb303sn
        tb303
        :in-trg
-       (->  (fst ["n e2" r r ["n d3" "n d4"]])
-             (rep 16)
-             (evr 2  (fst ["n e2" ["n d3"  "n c2"] r r]))
-             (rpl 8  (fst ["n e5" ["n d3"  "n c4"] r r]) )
-             ;;(rpl 3  (fst [(rep "n e3" 2)  (rep "n c#3" 2)  (rep "n b2" 2)  (rep "n b1" 2)]))
-             ;(evr 1 fst)
-             ;(evr 4 rev)
-             ;(evr 1 acc)
-             (evr 3  [["n e3" "n a2" r r] [r "n d3" "n e3" "n d3"]])
-             ;(evr 4  ["n d3" ["nd3" "nb2" "ne3" "na2"]])
-             ;(evr 5  ["n a3" r r ["ne3" "na2" "nd3" "nc2"]])
-             ;(evr 1 slw)
-             (evr 8 slw)
-             (evr 4 rev)
-             ;(evr 7 fst)
-             ;(evr 1 ["n c2"])
+       (->  ["n e3" r r ["n d3" "n d4"]]
+            (rep 8)
+            (evr 2 asc 0  [r "n c4"])
+            (evr 1 fst)
+            (evr 4 rpl 1 ["n  e5"])
+            (rpl 7 asc 2 ["n  d5"] nil)
+            (rpl 1 asc_2 [1 2]  ["n d6" "n c6"] nil)
+            ;(#(assoc (piv %) 1 [1 1 1 1 ]))
+            ;(#(assoc (piv %) 1  (apply assoc (nth  % 1) (interleave [1 2] ["n d6" "n c6"] ) ) ))
+                                        ;(#())
+                                        ;(evr 1 ["n c2"])
+            ;(seq)
              )
        :in-amp [1]
        :in-note  ":in-trg"
        :in-gate-select (-> [1]
                            (rep 16)
-                           (evr 4 [0]))
+                           ;(evr 4 [0])
+                           )
        :in-attack [0.0001]
        :in-decay [0.3919]
        :in-sustain [0.5]
        :in-release [0.1273]
        :in-r [0.9]
-       :in-cutoff [600]
+       :in-cutoff (-> [500 5000]
+                      (#(range (first  %) (last %) 10))
+                      (#(conj (reverse %) %))
+                      (#(flatten %))
+                      (#(partition 8 % ))
+                      (#(map vec %))
+                      ;(evr 2 (fst [(range 500 5000 100)] 16))
+                      (evr 1 fst 8)
+                      )
        :in-wave
        (rep [0] 4)
        )
@@ -214,6 +251,7 @@
 
 (fade-out! :tb303sn)
 
+(stp :tb303sn)
 
 ;;;;;;;;;;;;;;;;
 ;; End tb303sn
