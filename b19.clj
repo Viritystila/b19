@@ -344,7 +344,8 @@ d2_7sus2
   (trg :mooger1 mooger1
        :in-trg (-> [(rep 2 4)]
                    (rep 16)
-                   ;(evr 3 asc [1 2] [1 [r r 2 3]])
+                                        ;(evr 3 asc [1 2] [1 [r r 2 3]])
+                   (evr 8 [2 r [2 r 2 2] [2 2]])
                    (evr 1 map-in scl 0.2)
                    (evr 4 map-in scl 0.3)
                                         ;(evr 1 (fn [x] (println x) x) )
@@ -353,9 +354,10 @@ d2_7sus2
                    )
        :in-note  (-> (fll ["n f3" "nc3" ] 6)
                      (evr 2 ["n d4" "ne2"])
-                     (rep 8)
+                     (evr 3  ["n e3" r r  "ng2"])
+                     (rep 16)
                      (evr 3 asc 3 ["n e3" r r  "ng2"])
-                     (#(ins %  7 (fll ["nc4"  "nf3"] 3) 8 ["nc5" "nf4"] nil)) )
+                     (#(ins %  14 (fll ["nc4"  "nf3"] 3) 15 ["nc4" "nf4"] nil)) )
        :in-attack [0.01]
        :in-decay [0.41]
        :in-sustain [0.51]
@@ -365,7 +367,11 @@ d2_7sus2
        :in-fsustain [2.31]
        :in-frelease [0.051]
        :in-gate-select [0]
-       :in-osc2 [1])
+       :in-osc1 [0]
+       :in-osc2 [1]
+       :in-osc1-level [0.2]
+       :in-osc2-level  (fll [1 0] 128))
+
 
 
 
@@ -377,7 +383,46 @@ d2_7sus2
 
 (stp :mooger1)
 
-
 ;;;;;;;;;;;;;;;;;
 ;;End Mooger1;;;;
 ;;;;;;;;;;;;;;;;;
+
+
+
+;;;;;;;;;;;;;;;;;;
+;;;;Start hat2;;;;
+;;;;;;;;;;;;;;;;;;
+
+
+
+(do (trg :hat2 hat2)
+    (pause! :hat2)
+
+    (trg :hat2 hat2
+         :in-trg  (-> [[2 r] [2 3] r [r 3 4 5]]
+                   (rep 16)
+                                        ;(evr 3 asc [1 2] [1 [r r 2 3]])
+                   (evr 8 [4 r [5 r 1 2] [3 5]])
+                   (evr 1 map-in scl 0.01)
+                   (evr 4 map-in scl 0.02)
+                                        ;(evr 1 (fn [x] (println x) x) )
+                   (rpl 15 fst)
+                   (rpl 15 acc)
+                   (rpl 15 map-in scl 0.001 nil)
+                   (evr 1 #(mapv (fn [x] [x x]) %))
+                   )
+         :in-attack ":in-trg")
+
+
+
+    (volume! :hat2 1)
+
+    )
+
+
+(play! :hat2)
+
+(stp :hat2)
+;;;;;;;;;;;;;;;
+;; end hat2;;;;
+;;;;;;;;;;;;;;;
