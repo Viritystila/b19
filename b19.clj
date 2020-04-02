@@ -29,21 +29,22 @@
 ;;;;;;;;
 ;;cutter
 ;;;;;;;
-(cutter.cutter/start :fs "./default.fs" :vs "./default.vs" )
+(cutter.interface/start-cutter :fs "./default.fs" :vs "./default.vs" )
 
 (cam "3" :iChannel1)
 (set-cam "3" :fps 1)
 (stop-cam "3")
 (cut "../videos/saaristomeri.mp4" :sm 3500)
 (buf :sm :iChannel2)
+(stop-buf :sm)
 
 (cut "../videos/linko.mp4" :linko 0)
 
 (buf :linko :iChannel3)
 
-(stop-buf :sm)
+(stop-buf :linko)
 
-(toggle-recording "/dev/video5")
+(toggle-recording "/dev/video4")
 ;(stop-cutter)
 
 ;;;;;;;;;;;;;
@@ -76,30 +77,6 @@
 ;;Markorona
 ;;;;;;;;;;;;
 
-;; (defn split_text [text]
-;;   (let [ s_txt  (clojure.string/split text #" ")
-;;          s_txt  (mapv (fn [x] (apply str (filter #(Character/isLetter %) x)) ) s_txt )
-;;         s_txt  (remove (fn [x] (= (count x) 0) ) s_txt )]
-;;     (into [] s_txt)))
-
-;; (defn sentence_to_buffer
-;;   ([text]
-;;    (let [b_txt  (map (fn [x] (string-to-buffer x)) text)
-;;          d_txt  (into (sorted-map) (mapv
-;;                                     (fn [x] (let [bf     (string-to-buffer x)
-;;                                                  bfstr  (str x)
-;;                                                  bfkw   (keyword bfstr)
-;;                                                  id     (:id bf)
-;;                                                  sid    (str id)
-;;                                                  kid    (keyword sid)]
-;;                                              (add-sample bfstr bf)
-;;                                              [kid bfstr])) text))]
-;;      d_txt)))
-
-
-;; (defn parse_buffer_name [txt]
-;;    (mapv vec (partition 4  (map (fn [x] (str "b " x))  txt))))
-
 (do
   (def path "generalx2paradisedaqx2.txt")
   (def nosamples 20)
@@ -108,17 +85,9 @@
 
 (def split_mtxt (split_text mtxt))
 
-split
-
-split_mtxt
-
 (def split_mb (sentence_to_buffer split_mtxt ))
 
-split_mb
-
 (def t_txt (parse_buffer_name split_mtxt))
-
-(get-sample (keyword  "kakka"))
 
 (get-sample-id :choose)
 
@@ -131,9 +100,9 @@ t_txt
 
   (trg :markorona smp
        :in-trg
-       (->   t_txt
-             (rep 4)
-             (evr 4 fll 3 )
+       (->   (seq t_txt)
+             ;(rep 4)
+             (evr 4 fll 8 )
              (evr 3 [r])
              ;;(#(evr % 2 (first %)))
 
@@ -217,8 +186,9 @@ d2_7sus2
             (evr 8 rev)
             (ins 3  [ [(rep ["n c2" r r "n e3"] 16)] ["n d2"]   [ "n d3" "n d4"] r])
             (evr 2 rpl 1 ["n e3"] )
-            ;(rpl 7 asc [1 2]  [r "n d4" "n c5" r] nil)
+
             (ins 1  ["n e3" ["n c2"r "n e4"] "nc5" [r "ne4" "nd3"]])
+            (ins 2  [r [ r "n e4"] "ne3" [r "ne2" "nd3"]])
             ;(evr 9  [[(rep "n c4" 4)]  (fll [ "n e5" "n d3"] 4) r ["n e4"]]);
             ;(rpl 8 acc)
              )
@@ -263,6 +233,8 @@ d2_7sus2
 
 (stp :tb3030sne)
 
+(stp :tb303sn)
+
 (lss)
 
 
@@ -282,3 +254,117 @@ d2_7sus2
 ;;;;;;;;;;;;;;;;
 ;; End tb303sn
 ;;;;;;;;;;;;;;;;
+
+
+
+;;;;;;;;;;;;;;;;;;
+;;;Start mooger1;;
+;;;;;;;;;;;;;;;;;;
+
+(defsynth mooger1
+  "Choose 0, 1, or 2 for saw, sin, or pulse"
+  [in-trg 0
+   in-trg-val 0
+   in-note 60
+   in-note-val 60
+   in-amp 1
+   in-amp-val 1
+   in-osc1 1
+   in-osc1-val 1
+   in-osc2 1
+   in-osc2-val 1
+   in-cutoff 500
+   in-cutoff-val 500
+   in-attack 0.0022
+   in-attack-val 0.0022
+   in-decay 0.95
+   in-decay-val 0.95
+   in-sustain 0.4
+   in-sustain-val 0.4
+   in-release 0.3
+   in-release-val 0.3
+   in-fattack 0.22
+   in-fattack-val 0.22
+   in-fdecay 0.9
+   in-fdecay-val 0.9
+   in-fsustain 0.999
+   in-fsustain-val 0.999
+   in-frelease 0.001
+   in-frelease-val 0.001
+   in-osc1-level 0.5
+   in-osc1-level-val 0.5
+   in-osc2-level 0.5
+   in-osc2-level-val 0.5
+   in-gate-select 0
+   in-gate-select-val 0
+   ctrl-out 0
+   out-bus 0]
+  (let [gate           (in:kr in-trg)
+        gate-val       (in:kr in-trg-val)
+        trg-gate       (trig gate gate-val)
+        gate           (select:kr (in:kr in-gate-select-val)  [trg-gate gate])
+        note           (in:kr in-note-val)
+        amp            (in:kr in-amp-val)
+        osc1           (in:kr in-osc1-val)
+        osc2           (in:kr in-osc2-val)
+        cutoff         (in:kr in-cutoff-val)
+        attack         (in:kr in-attack-val)
+        decay          (in:kr in-decay-val)
+        sustain        (in:kr in-sustain-val)
+        release        (in:kr in-release-val)
+        fattack        (in:kr in-fattack-val)
+        fdecay         (in:kr in-fdecay-val)
+        fsustain       (in:kr in-fsustain-val)
+        frelease       (in:kr in-frelease-val)
+        osc1-level     (in:kr in-osc1-level-val)
+        osc2-level     (in:kr in-osc2-level-val)
+        freq           (midicps note)
+        osc-bank-1     [(saw freq) (sin-osc freq) (pulse freq)]
+        osc-bank-2     [(saw freq) (sin-osc freq) (pulse freq)]
+        amp-env        (env-gen (adsr attack decay sustain release) :gate gate)
+        f-env          (env-gen (adsr fattack fdecay fsustain frelease) :gate gate)
+        s1             (* osc1-level (select osc1 osc-bank-1))
+        s2             (* osc2-level (select osc2 osc-bank-2))
+        filt           (moog-ff (+ s1 s2) (* cutoff f-env) 3)]
+    (out out-bus (pan2 (* amp amp-env filt)))))
+
+
+(do
+  (trg :mooger1 mooger1)
+  (pause! :mooger1)
+  (trg :mooger1 mooger1
+       :in-trg (-> [(rep 2 4)]
+                   (rep 8)
+                   ;(evr 3 asc [1 2] [1 [r r 2 3]])
+                   (evr 1 map-in scl 0.2)
+                   (evr 4 map-in scl 0.3)
+                   ;(evr 1 (fn [x] (println x) x) )
+                   )
+       :in-note  (-> (fll ["n f3" "nc3" ] 6)
+                     (evr 2 ["n d4" "ne2"])
+                     (rep 8)
+                     (#(ins %  7 (fll ["nc4"  "nf3"] 3) 8 ["nc5" "nf4"] nil)))
+       :in-attack [0.01]
+       :in-decay [0.41]
+       :in-sustain [0.51]
+       :in-release [0.3]
+       :in-fattack [0.01]
+       :in-fdecay  [0.21]
+       :in-fsustain [2.31]
+       :in-frelease [0.051]
+       :in-gate-select [0])
+
+
+
+  (volume! :mooger1 3)
+
+  )
+
+(play! :mooger1)
+
+(stp :mooger1)
+
+
+;;;;;;;;;;;;;;;;;
+;;End Mooger1;;;;
+;;;;;;;;;;;;;;;;;
