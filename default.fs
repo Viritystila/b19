@@ -10,5 +10,5 @@ void main(void) {
   vec4 iChannel2_texture=texture2D(iChannel2, uv);
   vec4 iChannel3_texture=texture2D(iChannel3, uv);
   vec4 text=texture2D(iText, uv);
-  op =mix(iChannel1_texture-iChannel3_texture, iChannel2_texture+text*100, 0.9+iFloat1*iFloat1/5000);
+  op =mix(iChannel1_texture-iChannel3_texture, iChannel2_texture+text*100, 0.39);
 }

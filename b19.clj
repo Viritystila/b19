@@ -39,9 +39,7 @@
 (stop-buf :sm)
 
 (cut "../videos/linko.mp4" :linko 0)
-
 (buf :linko :iChannel3)
-
 (stop-buf :linko)
 
 (toggle-recording "/dev/video4")
@@ -256,6 +254,17 @@ d2_7sus2
 ;;;;;;;;;;;;;;;;
 
 
+(cut "../videos/txttv1.mp4" "teksti" 5000)
+(buf :teksti :iChannel3)
+(stop-buf :teksti)
+
+(cut "../videos/futu_luonto.mp4" "fl" 2000)
+(buf :fl :iChannel2)
+(stop-buf :fl)
+
+(cut "../videos/opi_pelaten.mp4" "op" 100)
+(buf :op :iChannel2)
+
 
 ;;;;;;;;;;;;;;;;;;
 ;;;Start mooger1;;
@@ -334,16 +343,19 @@ d2_7sus2
   (pause! :mooger1)
   (trg :mooger1 mooger1
        :in-trg (-> [(rep 2 4)]
-                   (rep 8)
+                   (rep 16)
                    ;(evr 3 asc [1 2] [1 [r r 2 3]])
                    (evr 1 map-in scl 0.2)
                    (evr 4 map-in scl 0.3)
-                   ;(evr 1 (fn [x] (println x) x) )
+                                        ;(evr 1 (fn [x] (println x) x) )
+                   (rpl 15 fst)
+                   (rpl 15 acc)
                    )
        :in-note  (-> (fll ["n f3" "nc3" ] 6)
                      (evr 2 ["n d4" "ne2"])
                      (rep 8)
-                     (#(ins %  7 (fll ["nc4"  "nf3"] 3) 8 ["nc5" "nf4"] nil)))
+                     (evr 3 asc 3 ["n e3" r r  "ng2"])
+                     (#(ins %  7 (fll ["nc4"  "nf3"] 3) 8 ["nc5" "nf4"] nil)) )
        :in-attack [0.01]
        :in-decay [0.41]
        :in-sustain [0.51]
@@ -352,7 +364,8 @@ d2_7sus2
        :in-fdecay  [0.21]
        :in-fsustain [2.31]
        :in-frelease [0.051]
-       :in-gate-select [0])
+       :in-gate-select [0]
+       :in-osc2 [1])
 
 
 
