@@ -29,7 +29,15 @@
 ;;;;;;;;
 ;;cutter
 ;;;;;;;
-(cutter.interface/start-cutter :fs "./default.fs" :vs "./default.vs" )
+;(def fs "/mnt/Varasto/biisit/Viritystila/cutter/resources/b19.fs")
+
+;(def vs "/mnt/Varasto/biisit/Viritystila/cutter/resources/b19.vs")
+
+;(cutter.interface/start-cutter :fs fs :vs vs )
+
+
+(cutter.interface/start-cutter :fs "./default.fs" :vs "./default.vs" :display-sync-hz 30)
+
 
 (cam "3" :iChannel1)
 (set-cam "3" :fps 1)
@@ -38,12 +46,19 @@
 (buf :sm :iChannel2)
 (stop-buf :sm)
 
-(cut "../videos/linko.mp4" :linko 0)
+(vid "../videos/bbb4k.mp4" :iChannel2)
+(cut "../videos/bbb4k.mp4" "bbb" 5000)
+(buf "bbb" :iChannel2)
+;(stop-vid "../videos/bbb4k.mp4")
+
+(cut "../videos/linko.mp4" "linko" 0)
 (buf :linko :iChannel3)
 (stop-buf :linko)
 
 (toggle-recording "/dev/video4")
-;(stop-cutter)
+
+
+(stop-cutter)
 
 ;;;;;;;;;;;;;
 ;;;Sync
@@ -64,6 +79,24 @@
 ;;End sync
 ;;;;;;;;;;;
 
+
+;;;;;;;;;;
+;;Tick;;;;
+;;;;;;;;;;
+
+
+(do
+  (trg :tick ping)
+  (pause! :tick)
+  (trg :tick ping :in-amp [0] :in-trg [(rep 1 10)])
+  (play! :tick))
+
+(stp :tick)
+
+
+;;;;;;;;;;;;
+;;End Tick;;
+;;;;;;;;;;;;
 
 
 ;;;;;;;;
@@ -253,8 +286,9 @@ d2_7sus2
 ;; End tb303sn
 ;;;;;;;;;;;;;;;;
 
+(* (* 2 60) 24)
 
-(cut "../videos/txttv1.mp4" "teksti" 5000)
+(cut "../videos/txttv1.mp4" "teksti" 3400)
 (buf :teksti :iChannel3)
 (stop-buf :teksti)
 
@@ -262,126 +296,79 @@ d2_7sus2
 (buf :fl :iChannel2)
 (stop-buf :fl)
 
-(cut "../videos/opi_pelaten.mp4" "op" 100)
+(cut "../videos/opi_pelaten.mp4" "op" 1000)
 (buf :op :iChannel2)
+(stop-buf :op)
 
+(cutter.interface/write  "Viritystila"  30  320 5 0.9 0.2 0.944 10 10 1)
 
 ;;;;;;;;;;;;;;;;;;
 ;;;Start mooger1;;
 ;;;;;;;;;;;;;;;;;;
 
-(defsynth mooger1
-  "Choose 0, 1, or 2 for saw, sin, or pulse"
-  [in-trg 0
-   in-trg-val 0
-   in-note 60
-   in-note-val 60
-   in-amp 1
-   in-amp-val 1
-   in-osc1 1
-   in-osc1-val 1
-   in-osc2 1
-   in-osc2-val 1
-   in-cutoff 500
-   in-cutoff-val 500
-   in-attack 0.0022
-   in-attack-val 0.0022
-   in-decay 0.95
-   in-decay-val 0.95
-   in-sustain 0.4
-   in-sustain-val 0.4
-   in-release 0.3
-   in-release-val 0.3
-   in-fattack 0.22
-   in-fattack-val 0.22
-   in-fdecay 0.9
-   in-fdecay-val 0.9
-   in-fsustain 0.999
-   in-fsustain-val 0.999
-   in-frelease 0.001
-   in-frelease-val 0.001
-   in-osc1-level 0.5
-   in-osc1-level-val 0.5
-   in-osc2-level 0.5
-   in-osc2-level-val 0.5
-   in-gate-select 0
-   in-gate-select-val 0
-   ctrl-out 0
-   out-bus 0]
-  (let [gate           (in:kr in-trg)
-        gate-val       (in:kr in-trg-val)
-        trg-gate       (trig gate gate-val)
-        gate           (select:kr (in:kr in-gate-select-val)  [trg-gate gate])
-        note           (in:kr in-note-val)
-        amp            (in:kr in-amp-val)
-        osc1           (in:kr in-osc1-val)
-        osc2           (in:kr in-osc2-val)
-        cutoff         (in:kr in-cutoff-val)
-        attack         (in:kr in-attack-val)
-        decay          (in:kr in-decay-val)
-        sustain        (in:kr in-sustain-val)
-        release        (in:kr in-release-val)
-        fattack        (in:kr in-fattack-val)
-        fdecay         (in:kr in-fdecay-val)
-        fsustain       (in:kr in-fsustain-val)
-        frelease       (in:kr in-frelease-val)
-        osc1-level     (in:kr in-osc1-level-val)
-        osc2-level     (in:kr in-osc2-level-val)
-        freq           (midicps note)
-        osc-bank-1     [(saw freq) (sin-osc freq) (pulse freq)]
-        osc-bank-2     [(saw freq) (sin-osc freq) (pulse freq)]
-        amp-env        (env-gen (adsr attack decay sustain release) :gate gate)
-        f-env          (env-gen (adsr fattack fdecay fsustain frelease) :gate gate)
-        s1             (* osc1-level (select osc1 osc-bank-1))
-        s2             (* osc2-level (select osc2 osc-bank-2))
-        filt           (moog-ff (+ s1 s2) (* cutoff f-env) 3)]
-    (out out-bus (pan2 (* amp amp-env filt)))))
-
 
 (do
-  (trg :mooger1 mooger1)
+  (trg :mooger1 mooger)
   (pause! :mooger1)
-  (trg :mooger1 mooger1
+  (trg :mooger1 mooger
        :in-trg (-> [(rep 2 4)]
                    (rep 16)
                                         ;(evr 3 asc [1 2] [1 [r r 2 3]])
-                   (evr 8 [2 r [2 r 2 2] [2 2]])
-                   (evr 1 map-in scl 0.2)
-                   (evr 4 map-in scl 0.3)
+                   ;(evr 8 [2 r [2 r 2 2] [2 2]])
+                   ;(evr 1 map-in scl 10.2)
+                   ;(evr 4 map-in scl 10.3)
                                         ;(evr 1 (fn [x] (println x) x) )
-                   (rpl 15 fst)
-                   (rpl 15 acc)
+                   ;(rpl 15 fst)
+                   ;(rpl 15 acc)
+                   ;(evr 5 [r])
+                   ;(#([x] (every-pred)))
                    )
        :in-note  (-> (fll ["n f3" "nc3" ] 6)
                      (evr 2 ["n d4" "ne2"])
                      (evr 3  ["n e3" r r  "ng2"])
                      (rep 16)
                      (evr 3 asc 3 ["n e3" r r  "ng2"])
-                     (#(ins %  14 (fll ["nc4"  "nf3"] 3) 15 ["nc4" "nf4"] nil)) )
-       :in-attack [0.01]
+                     (#(ins %  14 (fll ["nc4"  "nf3"] 3) 15 ["nc4" "nf4"] nil))
+                     )
+       :in-attack [0.001]
        :in-decay [0.41]
-       :in-sustain [0.51]
-       :in-release [0.3]
-       :in-fattack [0.01]
+       :in-sustain [0.251]
+       :in-release [0.123]
+       :in-fattack [0.0021]
        :in-fdecay  [0.21]
-       :in-fsustain [2.31]
-       :in-frelease [0.051]
-       :in-gate-select [0]
-       :in-osc1 [0]
-       :in-osc2 [1]
-       :in-osc1-level [0.2]
-       :in-osc2-level  (fll [1 0] 128))
+       :in-fsustain [0.31]
+       :in-frelease [0.21]
+       :in-gate-select [1]
+       :in-osc1 [2]
+       :in-osc2 [2]
+       :in-osc1-level [1]
+       :in-osc2-level [0]; (fll [1 0] 128)
+       )
 
 
 
 
-  (volume! :mooger1 3)
+  (volume! :mooger1 2)
 
   )
 
 (play! :mooger1)
 
 (stp :mooger1)
+
+
+
+
+(on-trigger (get-trigger-val-id :mooger1 :in-note)
+            (fn [val]
+              (let [ival    (midi->hz val)
+                    ]
+                ;(println val)
+                 (set-flt :iFloat1 ival)
+                ))
+            :mooger1)
+
+(remove-event-handler :mooger1)
 
 ;;;;;;;;;;;;;;;;;
 ;;End Mooger1;;;;
@@ -399,26 +386,24 @@ d2_7sus2
     (pause! :hat2)
 
     (trg :hat2 hat2
-         :in-trg  (-> [[2 r] [2 3] r [r 3 4 5]]
-                   (rep 16)
+         :in-trg  (-> [(range 2 8 1)]
+                   (rep 2)
                                         ;(evr 3 asc [1 2] [1 [r r 2 3]])
-                   (evr 8 [4 r [5 r 1 2] [3 5]])
-                   (evr 1 map-in scl 0.01)
-                   (evr 4 map-in scl 0.02)
+                   ;(evr 8 [4 r [5 r 1 2] [3 5]])
+                   (evr 1 map-in scl 0.025)
+                   (evr 2 map-in scl 0.05)
                                         ;(evr 1 (fn [x] (println x) x) )
-                   (rpl 15 fst)
-                   (rpl 15 acc)
-                   (rpl 15 map-in scl 0.001 nil)
-                   (evr 1 #(mapv (fn [x] [x x]) %))
+                   ;(rpl 15 fst)
+                   ;(rpl 15 acc)
+                   ;(rpl 15 map-in scl 0.001 nil)
+                   (evr 2 #(mapv (fn [x] [(rep x 8)]) %))
+                   (concat  [(rep [r] 2)])
                    )
          :in-attack ":in-trg")
-
-
 
     (volume! :hat2 1)
 
     )
-
 
 (play! :hat2)
 
@@ -426,3 +411,49 @@ d2_7sus2
 ;;;;;;;;;;;;;;;
 ;; end hat2;;;;
 ;;;;;;;;;;;;;;;
+
+
+;;;;;;;;;;;;;;;;;;;;;;;
+;;;Start Vintage bass;;
+;;;;;;;;;;;;;;;;;;;;;;;
+
+
+(do (trg :vb vintage-bass)
+    (pause! :vb)
+    (trg :vb vintage-bass
+         :in-trg (-> [1]
+                     (rep 8)
+                     (evr 2 (fn [x] [(rep x 16)])))
+         :in-note (-> ["n e1"]
+                      (rep 4)
+                      (evr 4 asc 1 ["n d2" "nf2" r r]))
+         :in-velocity [1000]
+         :in-gate-select (-> [1]
+                             (rep 8)
+                             (evr 8 [0])))
+
+    (volume! :vb 1))
+
+(play! :vb)
+
+(stp :vb)
+
+(def vbbus (audio-bus-monitor (get-out-bus :vb)))
+
+@vbbus
+
+(on-trigger (get-trigger-id :tick :in-trg)
+            (fn [val]
+              (let []
+                ;(println val)
+                 (set-flt :iFloat2 @vbbus)
+                ))
+            :vb)
+
+(remove-event-handler :vb)
+
+
+
+;;;;;;;;;;;;;;;;;;;;;;
+;;End Vintage bas;;;;;
+;;;;;;;;;;;;;;;;;;;;;;
