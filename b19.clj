@@ -36,14 +36,16 @@
 ;(cutter.interface/start-cutter :fs fs :vs vs )
 
 
-(cutter.interface/start-cutter :fs "./default.fs" :vs "./default.vs" :display-sync-hz 30)
+(cutter.interface/start-cutter :fs "./default.fs" :vs "./default.vs")
 
 
 (cam "3" :iChannel1)
 (set-cam "3" :fps 1)
 (stop-cam "3")
-(cut "../videos/saaristomeri.mp4" :sm 3500)
+(cut "/mnt/Varasto/biisit/Viritystila/videos/saaristomeri.mp4" :sm 3500)
+
 (buf :sm :iChannel2)
+
 (stop-buf :sm)
 
 (vid "../videos/bbb4k.mp4" :iChannel2)
@@ -423,10 +425,12 @@ d2_7sus2
     (trg :vb vintage-bass
          :in-trg (-> [1]
                      (rep 8)
-                     (evr 2 (fn [x] [(rep x 16)])))
+                     (evr 2 (fn [x] [(rep x 16)]))
+                     (evr 1 [(rep 1 8)]))
          :in-note (-> ["n e1"]
                       (rep 4)
-                      (evr 4 asc 1 ["n d2" "nf2" r r]))
+                      (evr 4 asc 1 ["n d2" "nf2" r r])
+                      (evr 1 ["nc1"]))
          :in-velocity [1000]
          :in-gate-select (-> [1]
                              (rep 8)
@@ -457,3 +461,125 @@ d2_7sus2
 ;;;;;;;;;;;;;;;;;;;;;;
 ;;End Vintage bas;;;;;
 ;;;;;;;;;;;;;;;;;;;;;;
+
+
+(cut "../videos/kotitietokone.mp4" "kt" 4420)
+(buf :kt :iChannel3)
+(stop-buf "kt")
+
+
+(stop-buf "tb1")
+
+(cut "../videos/toimittajarokotus.mp4" "tr" 0)
+(buf :tr :iChannel2)
+
+(stop-buf "tr")
+
+(fps-buf :tr 25)
+
+(cam "0" :iChannel1)
+
+(stop-cam "0")
+
+(cutter.interface/write "Viritystila"   30  320 5 0.9 0.2 0.944 10 10 0)
+
+
+;;;;;;;;;;;;;;;;;
+;;;Start kick;;;;
+;;;;;;;;;;;;;;;;;
+
+
+
+(do (trg :kick kick)
+    (pause! :kick)
+
+    (trg :kick kick
+         :in-trg (-> [(rep '("~" 1) 3)]
+                     (rep 8)
+                     ;(evr 1 asc 0 [r 1] 1 [r 1])
+                     ;(rpl 4 asc 1 [(rep 1 8)] nil)
+                     (evr 3 asc 5 [1 r 1 1] nil)
+                     (evr 8 [(rep  1 16)])
+                     ;(evr 8 acc)
+                     )
+         :in-f1 [500]
+         :in-f2 [2000]
+         :in-f3 [(range 50 80 5)]
+         )
+
+    (volume! :kick 1))
+
+
+(play! :kick)
+
+(stp :kick)
+
+
+
+(on-trigger (get-trigger-id :kick :in-trg)
+            (fn [val]
+              (let [ival   (int (* 1900 val))
+                    ]
+                                       ;(println val)
+                (i-buf :tr ival)
+                                        ;(set-flt :iFloat2 @vbbus)
+
+                ;; (cutter.interface/write
+                ;;  (str "Corona " (* (rand-int 10) ival))
+                ;;  (* (rand 15) 20)  (* (rand 2) ival) 5 0.9 0.2 0.944 10 10 true)
+
+                ))
+            :kick)
+
+(remove-event-handler :kick)
+
+
+(rand 10)
+
+;;;;;;;;;;;;;;;;;
+;;;;End kick;;;;;
+;;;;;;;;;;;;;;;;;
+
+
+
+
+;;;;;;;;;;;;;;;;;;;;
+;;;Start cs80lead1;;
+;;;;;;;;;;;;;;;;;;;;
+
+(do (trg :cs801 cs80lead)
+    (pause! :cs801)
+    (trg :cs801 cs80lead
+         :in-trg (-> [(rep 1 4)]
+                     (rep 8))
+
+         :in-gate-select (-> [0 1]
+                            (fll 1))
+         :in-freq (-> ["f c5"]
+                      (rep 4)
+                      (rpl 3 ["f d4"])
+                      (rpl 4 ["f e5" ])
+                      )
+         )
+
+    (volume! :cs801 1))
+
+
+(play! :cs801)
+
+
+(pause! :cs801)
+
+
+
+;;;;;;;;;;;;;;;;;;;;
+;;;End cs80lead;;;;;
+;;;;;;;;;;;;;;;;;;;;
+
+
+
+(cut "../videos/kansanparantaja.mp4" "kp" 4050)
+(buf :kp :iChannel3)
+
+(fps-buf "kp" 25)
+(stop-buf "kp")
