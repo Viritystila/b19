@@ -40,20 +40,15 @@
 
 
 (cam "3" :iChannel1)
-(set-cam "3" :fps 1)
+(set-cam "3" :fps 5)
 (stop-cam "3")
-(cut "/mnt/Varasto/biisit/Viritystila/videos/saaristomeri.mp4" :sm 3500)
+(cut "/mnt/Varasto/biisit/Viritystila/videos/saaristomeri.mp4" :sm :start-frame 3500)
 
 (buf :sm :iChannel2)
 
 (stop-buf :sm)
 
-(vid "../videos/bbb4k.mp4" :iChannel2)
-(cut "../videos/bbb4k.mp4" "bbb" 5000)
-(buf "bbb" :iChannel2)
-;(stop-vid "../videos/bbb4k.mp4")
-
-(cut "../videos/linko.mp4" "linko" 0)
+(cut "../videos/linko.mp4" "linko")
 (buf :linko :iChannel3)
 (stop-buf :linko)
 
@@ -290,15 +285,15 @@ d2_7sus2
 
 (* (* 2 60) 24)
 
-(cut "../videos/txttv1.mp4" "teksti" 3400)
+(cut "../videos/txttv1.mp4" "teksti" :start-frame 3400)
 (buf :teksti :iChannel3)
 (stop-buf :teksti)
 
-(cut "../videos/futu_luonto.mp4" "fl" 2000)
+(cut "../videos/futu_luonto.mp4" "fl" :start-frame 2000)
 (buf :fl :iChannel2)
 (stop-buf :fl)
 
-(cut "../videos/opi_pelaten.mp4" "op" 1000)
+(cut "../videos/opi_pelaten.mp4" "op" :start-frame 1000)
 (buf :op :iChannel2)
 (stop-buf :op)
 
@@ -463,14 +458,14 @@ d2_7sus2
 ;;;;;;;;;;;;;;;;;;;;;;
 
 
-(cut "../videos/kotitietokone.mp4" "kt" 4420)
+(cut "../videos/kotitietokone.mp4" "kt" :start-frame 4420)
 (buf :kt :iChannel3)
 (stop-buf "kt")
 
 
 (stop-buf "tb1")
 
-(cut "../videos/toimittajarokotus.mp4" "tr" 0)
+(cut "../videos/toimittajarokotus.mp4" "tr" )
 (buf :tr :iChannel2)
 
 (stop-buf "tr")
@@ -547,28 +542,81 @@ d2_7sus2
 ;;;Start cs80lead1;;
 ;;;;;;;;;;;;;;;;;;;;
 
-(do (trg :cs801 cs80lead)
-    (pause! :cs801)
-    (trg :cs801 cs80lead
-         :in-trg (-> [(rep 1 4)]
-                     (rep 8))
+(println (mapv find-note-name (chord :c3 :minor7)) )
 
-         :in-gate-select (-> [0 1]
-                            (fll 1))
-         :in-freq (-> ["f c5"]
+(do (def c1  (-> ["f c3"]
                       (rep 4)
-                      (rpl 3 ["f d4"])
-                      (rpl 4 ["f e5" ])
+                      (rpl 3 ["f g3"])
+                      (rpl 4 ["f eb3" ])
+                      (evr 2 rep 4)
+                      ))
+    (def c2   (-> ["f bb4"]
+                      (rep 8)
+                      (rpl 3 ["f eb3"])
+                      (rpl 4 ["f c4" ])
+                      (rpl 1 ["f g3"])
+                      (rpl 0 ["f g2"])
+                      (rpl 7 ["f eb4"])
+                      (evr 2 rep 4)
+                      (evr 2 asc 1 "f c5")
+                      (evr 3 asc 1 "f eb2")
                       )
-         )
+      )
 
-    (volume! :cs801 1))
+    )
 
 
-(play! :cs801)
 
+(do (trg :cs801 cs80lead)
+    (trg :cs802 cs80lead)
+    (pause! :cs801)
+    (pause! :cs802)
+
+    (do
+      (trg :cs801 cs80lead
+           :in-trg (-> [(rep 1 16)]
+                       (rep 8))
+
+           :in-gate-select (-> [0]
+                               (fll 16))
+           :in-freq c1
+           )
+
+      (trg :cs802 cs80lead
+           :in-trg (-> [(rep 1 16)]
+                       (rep 8))
+
+           :in-gate-select (-> [1]
+                               (fll 1))
+           :in-freq c2
+           ))
+
+    (volume! :cs801 1)
+    (volume! :cs802 1))
+
+
+(do
+  (play! :cs801)
+  (play! :cs802))
 
 (pause! :cs801)
+
+
+
+(def csbus (audio-bus-monitor (get-out-bus :cs801)))
+
+@csbus
+
+
+(on-trigger (get-trigger-id :tick :in-trg)
+            (fn [val]
+              (let []
+                ;(println val)
+                 (set-flt :iFloat2 @csbus)
+                ))
+            :cs801)
+
+(remove-event-handler :cs801)
 
 
 
@@ -578,8 +626,58 @@ d2_7sus2
 
 
 
-(cut "../videos/kansanparantaja.mp4" "kp" 4050)
+(cut "../videos/kansanparantaja.mp4" "kp" :start-frame 4050)
 (buf :kp :iChannel3)
 
 (fps-buf "kp" 25)
 (stop-buf "kp")
+
+
+
+(cut "../videos/eclipse2.mp4" "ec2" :start-frame 200)
+(buf "ec2" :iChannel2)
+
+
+;;;;;;;;;;;;;;;
+;;;Start png1;;
+;;;;;;;;;;;;;;;
+
+(do (trg :png1 ping)
+    (pause! :png1)
+    (trg :png1 ping
+         :in-trg [(rep 1 8)]
+         :in-attack [0.125]
+         :in-note (->  ["n eb4"]
+                       (rep 8)
+                       (piv)
+                       (asc 8 (rep ["n bb3"] 8))
+                       (flatten)
+                       (vec)
+                       (#(map vec (partition 1 %))))
+
+         )
+
+    (volume! :png1 0.5)
+
+    )
+
+
+(play! :png1)
+
+
+
+(on-trigger (get-trigger-val-id :png1 :in-note)
+            (fn [val]
+              (let [ival    (midi->hz val)
+                    ]
+                ;(println ival)
+                 (set-flt :iFloat1 ival)
+                ))
+            :png1)
+
+(remove-event-handler :png1)
+
+
+;;;;;;;;;;;;;;;;
+;;;Stop png1;;;;
+;;;;;;;;;;;;;;;;
