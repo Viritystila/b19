@@ -600,7 +600,7 @@ d2_7sus2
   (play! :cs802))
 
 (pause! :cs801)
-
+(pause! :cs802)
 
 
 (def csbus (audio-bus-monitor (get-out-bus :cs801)))
@@ -637,7 +637,7 @@ d2_7sus2
 (cut "../videos/eclipse2.mp4" "ec2" :start-frame 200)
 (buf "ec2" :iChannel2)
 
-
+(stop-buf "ec2")
 ;;;;;;;;;;;;;;;
 ;;;Start png1;;
 ;;;;;;;;;;;;;;;
@@ -664,7 +664,7 @@ d2_7sus2
 
 (play! :png1)
 
-
+(pause! :png1)
 
 (on-trigger (get-trigger-val-id :png1 :in-note)
             (fn [val]
@@ -681,3 +681,136 @@ d2_7sus2
 ;;;;;;;;;;;;;;;;
 ;;;Stop png1;;;;
 ;;;;;;;;;;;;;;;;
+
+
+
+;;;;;;;;;;;;;;;;
+;;;Start tom1;;;
+;;;;;;;;;;;;;;;;
+
+(do (trg :tom1 tom)
+    (pause! :tom1)
+
+
+    (trg :tom1 tom
+         :in-trg (-> [(rep 1 4)]
+                     (rep 24)
+                     (evr 3 asc 0 [ 1 [1 1]])
+                     (evr 6 asc 1 [1 r [(rep 1 4)] r])
+                     (evr 12 fst)
+                     (evr 24 acc))
+         :in-freq ["f g2"]
+         :in-attack [0.25])
+
+    )
+
+(play! :tom1)
+
+
+(stp :tom1)
+
+
+
+;;;;;;;;;;;;;;;
+;;;Stop tom1;;;
+;;;;;;;;;;;;;;;
+
+
+
+(cut "../videos/futu_luonto.mp4" "fl2" :start-frame 0)
+(buf :fl2 :iChannel2)
+(stop-buf :fl2)
+
+
+(cut "../videos/soviet1.mp4" "sv1" :start-frame 17400)
+(buf :sv1 :iChannel3)
+
+(stop-buf :sv1)
+
+(fps-buf :sv1 25)
+
+(set-flt :iFloat1 0.03)
+(set-flt :iFloat2 0.04)
+;;;;;;;;;;;;;;;;;
+;;Start sf1;;;;;;
+;;;;;;;;;;;;;;;;;
+
+(do
+  (trg :sf1 simple-flute)
+  (pause! :sf1)
+
+  (trg :sf1 simple-flute
+       :in-trg (-> [1 1 1 1]
+                   (rep 8)
+                   (evr 8 [r]))
+       :in-freq (-> ["f bb1"]
+                    (rep 4)
+                    (evr 2 ["f eb1"])
+                    (rpl 0 ["f c1" "fg2"]))
+       :in-gate-select [0])
+
+  (trg! :sf1 :sf1c trg-fx-chorus
+        :in-rate (-> [0.1]
+                     (rep 16)
+                     (evr 7 [14])) )
+
+  (volume! :sf1 15)
+
+  )
+
+
+(play! :sf1)
+
+(stp :sf1c)
+
+;;;;;;;;;;;;;;;;;
+;;End sf1;;;;;;;;
+;;;;;;;;;;;;;;;;;
+
+
+(do
+
+  (trg :smp1 smp)
+  (pause! :smp1)
+
+  (trg :smp1 smp
+       :in-trg (-> ["b bd4" "b hc1"]
+                   (rep 16)
+                   (evr 4 asc 1 (fn [x] [x "b ho3"]))
+                   (evr 15 asc 1 (fn [x] (acc (rep "b hc1" 32))))
+                   )
+       :in-buf ":in-trg")
+
+  )
+
+
+(play! :smp1)
+
+
+
+(on-trigger (get-trigger-id :smp1 :in-trg)
+            (fn [val]
+              (let [ival   (int (* 1900 val))
+                    ]
+                     ;;                  (println val)
+                (i-buf :sv1 ival)
+
+                ))
+            :smp1)
+
+(remove-event-handler :smp1)
+
+
+;;;;;;;;;;;;;;
+;;;Stop smp1;;
+;;;;;;;;;;;;;;
+
+
+(cut "../videos/pakkanen.mp4" "pak1" :start-frame 1030)
+(buf "pak1" :iChannel2)
+
+
+(cut "../videos/tserno4.mp4" "ts4" :start-frame 1625 :length 100)
+(buf "ts4" :iChannel3)
+
+(stop-buf "ts4")
