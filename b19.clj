@@ -26,23 +26,34 @@
     (println "Sample" name "loaded")
     txt))
 
+
+ ;;;;;;
+ ;;;futu-luonto, 4000 + sphere mesh
+ ;;;;;;
+
 ;;;;;;;;
 ;;cutter
 ;;;;;;;
-;(def fs "/mnt/Varasto/biisit/Viritystila/cutter/resources/b19.fs")
+(stop-cutter)
 
-;(def vs "/mnt/Varasto/biisit/Viritystila/cutter/resources/b19.vs")
+(cutter.interface/start-cutter :fs "./default.fs" :vs "./default.vs" :gs "./default.gs")
 
-;(cutter.interface/start-cutter :fs fs :vs vs )
+(cutter.interface/start-cutter)
 
+(cutter.cutter/request-mesh "../cutter/resources/dsplane.dae")
 
-(cutter.interface/start-cutter :fs "./default.fs" :vs "./default.vs")
-
+(cutter.cutter/remove-mesh "3")
 
 (cam "3" :iChannel1)
 (set-cam "3" :fps 5)
 (stop-cam "3")
 (cut "/mnt/Varasto/biisit/Viritystila/videos/saaristomeri.mp4" :sm :start-frame 3500)
+
+(cut "/mnt/Varasto/biisit/Viritystila/videos/spede.mp4" "sp" :start-frame 51900)
+
+
+(buf "sp" :iChannel2)
+
 
 (buf :sm :iChannel2)
 
@@ -61,7 +72,7 @@
 ;;;Sync
 ;;;;;;;;;;;;
 
-(trg :sync ping :in-trg [1 1 1])
+(trg :sync ping :in-trg [1 1])
 
 (pause! :sync)
 
@@ -74,7 +85,7 @@
 
 ;;;;;;;;;;;;
 ;;End sync
-;;;;;;;;;;;
+q;;;;;;;;;;;
 
 
 ;;;;;;;;;;
@@ -181,6 +192,15 @@ t_txt
                 ))
             :markorona)
 
+ (cutter.interface/write  "Sivulle"  30  320 5 0.9 0.2 0.944 10 10 1)
+
+ (cutter.interface/write  "Suoraksi"  30  320 5 0.9 0.2 0.944 10 10 1)
+
+ (cutter.interface/write  "Suoraan"  30  320 5 0.9 0.2 0.944 10 10 1)
+
+ (cutter.interface/write  "Tempossa" 30  320 5 0.9 0.2 0.944 10 10 1)
+
+
 (remove-event-handler :markorona)
 
 ;;;;;;;;;;;;;;;;
@@ -209,15 +229,16 @@ d2_7sus2
        (->  [["n e2"]  [ "n d1" "n d3"] r r]
             (rep 8)
             (evr 3 asc 0  [r r  "n c4" r] nil)
-            (evr 2 [r])
-            (evr 1 fst)
-            (evr 8 rev)
-            (ins 3  [ [(rep ["n c2" r r "n e3"] 16)] ["n d2"]   [ "n d3" "n d4"] r])
-            (evr 2 rpl 1 ["n e3"] )
+            ;(evr 2 [r])
+            ;(evr 1 fst)
+            ;(evr 8 rev)
+            ;(ins 3  [ [(rep ["n c2" r r "n e3"] 16)] ["n d2"]   [ "n d3" "n d4"] r])
+            ;(evr 2 rpl 1 ["n e3"] )
 
-            (ins 1  ["n e3" ["n c2"r "n e4"] "nc5" [r "ne4" "nd3"]])
-            (ins 2  [r [ r "n e4"] "ne3" [r "ne2" "nd3"]])
-            ;(evr 9  [[(rep "n c4" 4)]  (fll [ "n e5" "n d3"] 4) r ["n e4"]]);
+            ;(ins 1  ["n e3" ["n c2"r "n e4"] "nc5" [r "ne4" "nd3"]])
+            ;(ins 2  [r [ r "n e4"] "ne3" [r "ne2" "nd3"]])
+                                        ;(evr 9  [[(rep "n c4" 4)]  (fll [ "n e5" "n d3"] 4) r ["n e4"]]);
+            (evr 3 fst)
             ;(rpl 8 acc)
              )
        :in-amp [1]
@@ -247,7 +268,7 @@ d2_7sus2
        (fll [0 1] 32)
        )
 
-  (volume! :tb303sn 2.6)
+  (volume! :tb303sn 1.06)
 
   (trg! :tb303sn :tb3030sne trg-fx-chorus
         :in-rate [0.1]
@@ -308,24 +329,24 @@ d2_7sus2
   (trg :mooger1 mooger)
   (pause! :mooger1)
   (trg :mooger1 mooger
-       :in-trg (-> [(rep 2 4)]
+       :in-trg (-> [(rep 2 16)]
                    (rep 16)
-                                        ;(evr 3 asc [1 2] [1 [r r 2 3]])
-                   ;(evr 8 [2 r [2 r 2 2] [2 2]])
+                   ;                     (evr 3 asc [1 2] [1 [r r 2 3]])
+                   (evr 4 (fst [2 r [2 r 2 2] [2 2]]))
                    ;(evr 1 map-in scl 10.2)
                    ;(evr 4 map-in scl 10.3)
                                         ;(evr 1 (fn [x] (println x) x) )
                    ;(rpl 15 fst)
                    ;(rpl 15 acc)
-                   ;(evr 5 [r])
+                   (evr 5 acc)
                    ;(#([x] (every-pred)))
                    )
        :in-note  (-> (fll ["n f3" "nc3" ] 6)
-                     (evr 2 ["n d4" "ne2"])
-                     (evr 3  ["n e3" r r  "ng2"])
-                     (rep 16)
-                     (evr 3 asc 3 ["n e3" r r  "ng2"])
-                     (#(ins %  14 (fll ["nc4"  "nf3"] 3) 15 ["nc4" "nf4"] nil))
+                     (evr 2 ["n d5" "ne3"])
+                     (evr 3  ["n e4" r r  "ng4"])
+                     ;(rep 16)
+                     ;(evr 3 asc 3 ["n e3" r r  "ng2"])
+                     ;(#(ins %  14 (fll ["nc4"  "nf3"] 3) 15 ["nc4" "nf4"] nil))
                      )
        :in-attack [0.001]
        :in-decay [0.41]
@@ -338,14 +359,14 @@ d2_7sus2
        :in-gate-select [1]
        :in-osc1 [2]
        :in-osc2 [2]
-       :in-osc1-level [1]
-       :in-osc2-level [0]; (fll [1 0] 128)
+       :in-osc1-level [0]
+       :in-osc2-level [1]; (fll [1 0] 128)
        )
 
 
 
 
-  (volume! :mooger1 2)
+  (volume! :mooger1 1.5)
 
   )
 
@@ -383,11 +404,11 @@ d2_7sus2
     (pause! :hat2)
 
     (trg :hat2 hat2
-         :in-trg  (-> [(range 2 8 1)]
+         :in-trg  (-> [(range 2 8 0.5)]
                    (rep 2)
                                         ;(evr 3 asc [1 2] [1 [r r 2 3]])
                    ;(evr 8 [4 r [5 r 1 2] [3 5]])
-                   (evr 1 map-in scl 0.025)
+                   ;(evr 1 map-in scl 0.025)
                    (evr 2 map-in scl 0.05)
                                         ;(evr 1 (fn [x] (println x) x) )
                    ;(rpl 15 fst)
@@ -418,20 +439,24 @@ d2_7sus2
 (do (trg :vb vintage-bass)
     (pause! :vb)
     (trg :vb vintage-bass
-         :in-trg (-> [1]
+         :in-trg (-> [1 1]
                      (rep 8)
-                     (evr 2 (fn [x] [(rep x 16)]))
-                     (evr 1 [(rep 1 8)]))
+                     ;(evr 2 (fn [x] [(rep x 16)]))
+                     ;(evr 1 [(rep 1 8)])
+                     )
          :in-note (-> ["n e1"]
                       (rep 4)
-                      (evr 4 asc 1 ["n d2" "nf2" r r])
-                      (evr 1 ["nc1"]))
-         :in-velocity [1000]
+                      (evr 4 asc 1 ["n d3" "nf4" r r])
+                      (evr 1 ["nc1"])
+                      )
+         :in-velocity  (map vec (partition 1 (range 1000 3000 100)))
          :in-gate-select (-> [1]
                              (rep 8)
                              (evr 8 [0])))
 
-    (volume! :vb 1))
+    (volume! :vb 0.25)
+
+    )
 
 (play! :vb)
 
@@ -489,7 +514,7 @@ d2_7sus2
     (pause! :kick)
 
     (trg :kick kick
-         :in-trg (-> [(rep '("~" 1) 3)]
+         :in-trg (-> [(rep '("~" 1) 4)]
                      (rep 8)
                      ;(evr 1 asc 0 [r 1] 1 [r 1])
                      ;(rpl 4 asc 1 [(rep 1 8)] nil)
@@ -502,7 +527,9 @@ d2_7sus2
          :in-f3 [(range 50 80 5)]
          )
 
-    (volume! :kick 1))
+    (volume! :kick 0.001)
+
+    )
 
 
 (play! :kick)
@@ -544,22 +571,22 @@ d2_7sus2
 
 (println (mapv find-note-name (chord :c3 :minor7)) )
 
-(do (def c1  (-> ["f c3"]
+(do (def c1  (-> ["f c2"]
                       (rep 4)
-                      (rpl 3 ["f g3"])
-                      (rpl 4 ["f eb3" ])
+                      ;(rpl 3 ["f g2"])
+                      ;(rpl 4 ["f eb2" ])
                       (evr 2 rep 4)
                       ))
-    (def c2   (-> ["f bb4"]
+    (def c2   (-> ["f bb1"]
                       (rep 8)
-                      (rpl 3 ["f eb3"])
-                      (rpl 4 ["f c4" ])
-                      (rpl 1 ["f g3"])
-                      (rpl 0 ["f g2"])
-                      (rpl 7 ["f eb4"])
-                      (evr 2 rep 4)
-                      (evr 2 asc 1 "f c5")
-                      (evr 3 asc 1 "f eb2")
+                      (rpl 3 ["f c2"])
+                      ;(rpl 4 ["f g3" ])
+                      ;(rpl 1 ["f eb2"])
+                      ;(rpl 0 ["f bb2"])
+                      ;(rpl 7 ["f g3"])
+                      ;(evr 2 rep 4)
+                      ;(evr 2 asc 1 "f bb3")
+                      ;(evr 3 asc 1 "f eb2")
                       )
       )
 
@@ -574,25 +601,30 @@ d2_7sus2
 
     (do
       (trg :cs801 cs80lead
-           :in-trg (-> [(rep 1 16)]
-                       (rep 8))
+           :in-trg (-> [(rep 1 8)]
+                       (rep 2)
+                       (evr 2 [(rep 1 16)])
+                       )
 
-           :in-gate-select (-> [0]
+           :in-gate-select (-> [1]
                                (fll 16))
            :in-freq c1
            )
 
       (trg :cs802 cs80lead
-           :in-trg (-> [(rep 1 16)]
-                       (rep 8))
+           :in-trg (-> [(rep 1 32)]
+                       (rep 2)
+                       ;(evr 2 [r])
+                       )
 
-           :in-gate-select (-> [1]
+           :in-gate-select (-> [0]
                                (fll 1))
            :in-freq c2
            ))
 
-    (volume! :cs801 1)
-    (volume! :cs802 1))
+    (volume! :cs801 0.25)
+    (volume! :cs802 0.25)
+    )
 
 
 (do
@@ -629,7 +661,7 @@ d2_7sus2
 (cut "../videos/kansanparantaja.mp4" "kp" :start-frame 4050)
 (buf :kp :iChannel3)
 
-(fps-buf "kp" 25)
+(fps-buf "kp" 150)
 (stop-buf "kp")
 
 
@@ -657,7 +689,7 @@ d2_7sus2
 
          )
 
-    (volume! :png1 0.5)
+    (volume! :png1 0.25)
 
     )
 
@@ -721,13 +753,14 @@ d2_7sus2
 (buf :fl2 :iChannel2)
 (stop-buf :fl2)
 
+(fps-buf :fl2 10)
 
 (cut "../videos/soviet1.mp4" "sv1" :start-frame 17400)
 (buf :sv1 :iChannel3)
 
 (stop-buf :sv1)
 
-(fps-buf :sv1 25)
+(fps-buf :sv1 10)
 
 (set-flt :iFloat1 0.03)
 (set-flt :iFloat2 0.04)
@@ -743,14 +776,14 @@ d2_7sus2
        :in-trg (-> [1 1 1 1]
                    (rep 8)
                    (evr 8 [r]))
-       :in-freq (-> ["f bb1"]
+       :in-freq (-> ["f bb2"]
                     (rep 4)
                     (evr 2 ["f eb1"])
-                    (rpl 0 ["f c1" "fg2"]))
-       :in-gate-select [0])
+                    (rpl 0 ["f c1" "fg3"]))
+       :in-gate-select [1])
 
   (trg! :sf1 :sf1c trg-fx-chorus
-        :in-rate (-> [0.1]
+        :in-rate (-> [0.741]
                      (rep 16)
                      (evr 7 [14])) )
 
@@ -778,9 +811,11 @@ d2_7sus2
                    (rep 16)
                    (evr 4 asc 1 (fn [x] [x "b ho3"]))
                    (evr 15 asc 1 (fn [x] (acc (rep "b hc1" 32))))
+                   (evr 1 fst)
                    )
        :in-buf ":in-trg")
 
+    (volume! :smp1 0.25)
   )
 
 
@@ -790,7 +825,7 @@ d2_7sus2
 
 (on-trigger (get-trigger-id :smp1 :in-trg)
             (fn [val]
-              (let [ival   (int (* 1900 val))
+              (let [ival   (int (* 2000 val))
                     ]
                      ;;                  (println val)
                 (i-buf :sv1 ival)
@@ -814,3 +849,63 @@ d2_7sus2
 (buf "ts4" :iChannel3)
 
 (stop-buf "ts4")
+
+
+;;;;;;;;;;;;;;;
+;;;Start bow1;;
+;;;;;;;;;;;;;;;
+
+(trg :bow1 bowed)
+(pause! :bow1)
+
+(trg :bow1 bowed
+     :in-trg (->  [r]
+                 (rep 8)
+                 (evr 4 [(rep 0.001 8)]))
+     :in-note (-> '(["n bb1"] ["n eb1"])
+                  (rep 8)
+                  (evr 8 fll 8))
+     :in-gate-select [1]
+     :in-vib-freq [6.28]
+     :in-attack [0.01]
+     :in-decay  [0.05]
+     :in-sustain [0.1]
+     :in-release [1.2])
+
+
+(volume! :bow1 0.25)
+
+(play! :bow1)
+
+
+
+
+(def bow1bus (audio-bus-monitor (get-out-bus :bow1)))
+
+@bow1bus
+
+
+(on-trigger (get-trigger-id :tick :in-trg)
+            (fn [val]
+              (let []
+                ;(println val)
+                (set-flt :iFloat2 @bow1bus)
+                (set-flt :iFloat1 @bow1bus)
+
+                (cutter.interface/write  "Sivulle"  (* (rand 10) 160)
+                                         (* @bow1bus 3520) 5 0.9 0.2 0.944 10 10 true)
+
+                ))
+            :bow1)
+
+(remove-event-handler :bow1)
+
+;;;;;;;;;;;;;
+;;;End bow1;;
+;;;;;;;;;;;;;
+
+
+  (cutter.interface/write  "Viritystila"  30
+                           320 5 0.9 0.2 0.944 10 10 true)
+
+(sta)
