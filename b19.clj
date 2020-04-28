@@ -31,6 +31,11 @@
  ;;;futu-luonto, 4000 + sphere mesh
  ;;;;;;
 
+;;;Biisi1
+;;vb, kick cs801 ja cs802
+
+
+
 ;;;;;;;;
 ;;cutter
 ;;;;;;;
@@ -40,9 +45,9 @@
 
 (cutter.interface/start-cutter)
 
-(cutter.cutter/request-mesh "../cutter/resources/dsplane.dae")
+(cutter.cutter/request-mesh "../cutter/resources/sphere.dae")
 
-(cutter.cutter/remove-mesh "3")
+(cutter.cutter/remove-mesh "2")
 
 (cam "3" :iChannel1)
 (set-cam "3" :fps 5)
@@ -439,22 +444,29 @@ d2_7sus2
 (do (trg :vb vintage-bass)
     (pause! :vb)
     (trg :vb vintage-bass
-         :in-trg (-> [1 1]
-                     (rep 8)
-                     ;(evr 2 (fn [x] [(rep x 16)]))
-                     ;(evr 1 [(rep 1 8)])
+         :in-trg (-> '([1 "~" [1 1] 1]
+                       [["~" 1] "~" "~" 1 ]
+                       [["~" 1] "~" 1 1 ]
+                       [["~" [1 1]] "~" "~" "~" ])
+                     (rep 16)
+                     (evr 6 fst)
+                     (evr 16 asc 1 [1 r])
                      )
-         :in-note (-> ["n e1"]
-                      (rep 4)
-                      (evr 4 asc 1 ["n d3" "nf4" r r])
-                      (evr 1 ["nc1"])
+         :in-note (-> (seq [["n eb1" "n g2" [r r  "neb2" "nc2"] "nbb2"]
+                            ["n eb1" r ["nbb2" "nb2"] "neb2"]])
+                      (rep 8)
+                      (evr 4 asc 1 ["n c3" "ng4" r r])
+                      (evr 8 asc 1 ["n bb3" "ng4" "neb2" r])
+                      ;(evr 6 fst)
+                      ;(evr 1 ["nc1"])
                       )
          :in-velocity  (map vec (partition 1 (range 1000 3000 100)))
          :in-gate-select (-> [1]
                              (rep 8)
-                             (evr 8 [0])))
+                             ;(evr 8 [0 1 1 0])
+                             ))
 
-    (volume! :vb 0.25)
+    (volume! :vb 0.125)
 
     )
 
@@ -469,7 +481,7 @@ d2_7sus2
 (on-trigger (get-trigger-id :tick :in-trg)
             (fn [val]
               (let []
-                ;(println val)
+               ; (println val)
                  (set-flt :iFloat2 @vbbus)
                 ))
             :vb)
@@ -515,28 +527,27 @@ d2_7sus2
 
     (trg :kick kick
          :in-trg (-> [(rep '("~" 1) 4)]
-                     (rep 8)
+                     (rep 16)
                      ;(evr 1 asc 0 [r 1] 1 [r 1])
-                     ;(rpl 4 asc 1 [(rep 1 8)] nil)
+                     (evr 8 asc 1 [(rep 1 8)] nil)
                      (evr 3 asc 5 [1 r 1 1] nil)
-                     (evr 8 [(rep  1 16)])
+                     (evr 16 [[1] [(rep  1 4)] [1 [r r 1 1]] [1 r r 1]])
                      ;(evr 8 acc)
                      )
          :in-f1 [500]
-         :in-f2 [2000]
+         :in-f2 [3000]
          :in-f3 [(range 50 80 5)]
          )
 
-    (volume! :kick 0.001)
+    (volume! :kick 0.01)
 
     )
 
 
 (play! :kick)
 
+
 (stp :kick)
-
-
 
 (on-trigger (get-trigger-id :kick :in-trg)
             (fn [val]
@@ -555,7 +566,6 @@ d2_7sus2
 
 (remove-event-handler :kick)
 
-
 (rand 10)
 
 ;;;;;;;;;;;;;;;;;
@@ -571,26 +581,59 @@ d2_7sus2
 
 (println (mapv find-note-name (chord :c3 :minor7)) )
 
+
+;;keskivaihe loppu
 (do (def c1  (-> ["f c2"]
                       (rep 4)
-                      ;(rpl 3 ["f g2"])
-                      ;(rpl 4 ["f eb2" ])
+                      (rpl 3 ["f g2"])
+                      (rpl 4 ["f eb2" ])
                       (evr 2 rep 4)
                       ))
     (def c2   (-> ["f bb1"]
                       (rep 8)
                       (rpl 3 ["f c2"])
-                      ;(rpl 4 ["f g3" ])
-                      ;(rpl 1 ["f eb2"])
-                      ;(rpl 0 ["f bb2"])
-                      ;(rpl 7 ["f g3"])
-                      ;(evr 2 rep 4)
-                      ;(evr 2 asc 1 "f bb3")
-                      ;(evr 3 asc 1 "f eb2")
-                      )
-      )
+                      (rpl 4 ["f g3" ])
+                      (rpl 1 ["f eb2"])
+                      (rpl 0 ["f bb2"])
+                      (rpl 7 ["f g3"])
+                      (evr 2 rep 4)
+                      (evr 2 asc 1 "f bb3")
+                      (evr 3 asc 1 "f eb2")
+                      )))
 
-    )
+
+(do (def c1  (-> ["f g2"]
+                      (rep 8)
+                      ))
+    (def c2   (-> ["f bb1"]
+                      (rep 8)
+                      (rpl 3 ["f c3"])
+                      (rpl 4 ["f c2" ])
+                      (evr 2 rep 4)
+                      (evr 2 asc 1 "f bb3")
+                      (evr 4 asc 1 "f eb4")
+                      )))
+
+
+
+(do (def c1  (->  '(["f g2"]
+                    ["f c4"]
+                    ["f eb4"])
+                      (rep 1)
+                      ))
+    (def c2   (-> ["f bb1"]
+                      (rep 16)
+                      (rpl 3 ["f c3"])
+                      (rpl 4 ["f c2" ])
+                      (evr 2 rep 4)
+                      (evr 2 asc 1 "f bb3")
+                      (evr 4 asc 1 "f eb4")
+                      (evr 8 asc 1 "f c3")
+                      (evr 9 asc 1 "f eb5")
+                      (evr 10 asc 1 "f eb5")
+                      (evr 11 asc 1 "f c4")
+                      )))
+
 
 
 
@@ -651,6 +694,8 @@ d2_7sus2
 (remove-event-handler :cs801)
 
 
+(stp :cs801)
+(stp :cs802)
 
 ;;;;;;;;;;;;;;;;;;;;
 ;;;End cs80lead;;;;;

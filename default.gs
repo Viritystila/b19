@@ -26,9 +26,6 @@ out VertexData {
 {
 
 
-
-
-
     for(int i = 0; i < gl_in.length(); i++)
   {
 
