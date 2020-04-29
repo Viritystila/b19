@@ -27,6 +27,8 @@
     txt))
 
 
+(sta)
+
  ;;;;;;
  ;;;futu-luonto, 4000 + sphere mesh
  ;;;;;;
@@ -34,7 +36,8 @@
 ;;;Biisi1
 ;;vb, kick cs801 ja cs802
 
-
+;;;Biisi2
+;; sf1, smp1, bow2
 
 ;;;;;;;;
 ;;cutter
@@ -701,15 +704,15 @@ d2_7sus2
 ;;;End cs80lead;;;;;
 ;;;;;;;;;;;;;;;;;;;;
 
-
+(stop-buf "tr")
 
 (cut "../videos/kansanparantaja.mp4" "kp" :start-frame 4050)
 (buf :kp :iChannel3)
 
-(fps-buf "kp" 150)
+(fps-buf "kp" 10)
 (stop-buf "kp")
 
-
+(remove-mesh "2")
 
 (cut "../videos/eclipse2.mp4" "ec2" :start-frame 200)
 (buf "ec2" :iChannel2)
@@ -820,20 +823,19 @@ d2_7sus2
   (trg :sf1 simple-flute
        :in-trg (-> [1 1 1 1]
                    (rep 8)
-                   (evr 8 [r]))
+                   (evr 4 (rep ["~"] 4)))
        :in-freq (-> ["f bb2"]
-                    (rep 4)
+                    (rep 8)
                     (evr 2 ["f eb1"])
-                    (rpl 0 ["f c1" "fg3"]))
+                    (rpl 0 ["f c1" "fg3"])
+                    (evr 6 asc 0 ["f bb2" "fbb1"]))
        :in-gate-select [1])
 
   (trg! :sf1 :sf1c trg-fx-chorus
         :in-rate (-> [0.741]
                      (rep 16)
                      (evr 7 [14])) )
-
   (volume! :sf1 15)
-
   )
 
 
@@ -850,13 +852,16 @@ d2_7sus2
 
   (trg :smp1 smp)
   (pause! :smp1)
-
   (trg :smp1 smp
-       :in-trg (-> ["b bd4" "b hc1"]
+       :in-trg (-> ["b bd4" "b hh0"]
                    (rep 16)
-                   (evr 4 asc 1 (fn [x] [x "b ho3"]))
-                   (evr 15 asc 1 (fn [x] (acc (rep "b hc1" 32))))
+                   (evr 4 asc 1 (fn [x] [x "b ho0"]))
+                   ;;(evr 15 asc 0 (fn [x] (acc (rep "b hc1" 32))))
                    (evr 1 fst)
+                   ;;(evr 15 asc 0 (fn [x] (acc (rep "b hc1" 64))))
+                   (evr 9 asc 1 (rep "b bass15" 1))
+                   (evr 8 slw)
+                   (evr 11 asc 3 (fll ["bhh0" "bho1"] 8))
                    )
        :in-buf ":in-trg")
 
@@ -900,25 +905,28 @@ d2_7sus2
 ;;;Start bow1;;
 ;;;;;;;;;;;;;;;
 
-(trg :bow1 bowed)
-(pause! :bow1)
+(do
+  (trg :bow1 bowed)
+  (pause! :bow1)
 
-(trg :bow1 bowed
-     :in-trg (->  [r]
-                 (rep 8)
-                 (evr 4 [(rep 0.001 8)]))
-     :in-note (-> '(["n bb1"] ["n eb1"])
-                  (rep 8)
-                  (evr 8 fll 8))
-     :in-gate-select [1]
-     :in-vib-freq [6.28]
-     :in-attack [0.01]
-     :in-decay  [0.05]
-     :in-sustain [0.1]
-     :in-release [1.2])
+  (trg :bow1 bowed
+       :in-trg (->  [r]
+                    (rep 8)
+                    (evr 4 (rep  [(rep 0.001 4)] 2)))
+       :in-note (-> '(["n bb1"] ["n eb2"])
+                    (rep 8)
+                    (evr 8 fll 16))
+       :in-gate-select [1]
+       :in-bow-slope  [0.2]
+       :in-bow-offset [0.01]
+       :in-vib-freq ["f eb3"]
+       :in-attack [0.01]
+       :in-decay  [0.05]
+       :in-sustain [5.1]
+       :in-release [2.2])
 
 
-(volume! :bow1 0.25)
+  (volume! :bow1 0.125))
 
 (play! :bow1)
 
