@@ -825,20 +825,41 @@ d2_7sus2
 
   (trg :sf1 simple-flute
        :in-trg (-> [1 1 1 1]
-                   (rep 8)
+                   (rep 32)
                    (evr 4 (rep ["~"] 4)))
+       (-> [1 1 1 [1 1]]
+           (rep 32)
+           (evr 4 (rep ["~"] 2)))
+       (-> [(rep 8 1)]
+           (rep 32)
+           (evr 4 (rep ["~"] 2))
+           (evr 3 acc))
        :in-freq (-> ["f bb2"]
-                    (rep 8)
+                    (rep 32)
                     (evr 2 ["f eb1"])
                     (rpl 0 ["f c1" "fg3"])
                     (evr 6 asc 0 ["f bb2" "fbb1"]))
+        (-> ["f eb2"]
+                    (rep 32)
+                    (evr 2 ["f bb1" "feb3"])
+                    (rpl 0 ["f g2" "fc2"])
+                    (evr 6 asc 0 ["f bb2" "fbb1"]))
+        (-> ["f eb2"]
+            (rep 32)
+            (evr 2 ["f bb2"])
+            (rpl 0 ["fc2"])
+            (evr 2 asc 0 ["f bb3"]))
        :in-gate-select [1])
 
   (trg! :sf1 :sf1c trg-fx-chorus
         :in-rate (-> [0.741]
-                     (rep 16)
-                     (evr 7 [14])) )
-  (volume! :sf1 15)
+                     (rep 32)
+                     (evr 7 [14]))
+         (-> [0.8419]
+                     (rep 32)
+                     (evr 7 [2]))
+        )
+  (volume! :sf1 11)
   )
 
 
