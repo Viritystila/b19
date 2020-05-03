@@ -899,7 +899,7 @@ d2_7sus2
            (evr 3 asc 1 (fn [x] [x "b bd0" "bsn1" x ]))
            )
   (-> ["b bd1" "b hh0"]
-           (rep 16)
+           (rep 32)
            (evr 1 asc 0 [r "b bd1"] )
            (evr 4 asc 0 [(rep  "b bass15" 4)])
            (evr 3 asc 0 (fn [x] [(fst x 8)]))
@@ -910,7 +910,7 @@ d2_7sus2
            (evr 2 asc 1 (fn [x] (fll [x "b bd0" "bsn1" x ] 6)))
            )
   (-> ["b bd1" "b hh0"]
-           (rep 16)
+           (rep 32)
            (evr 1 asc 0 [r "b bd1"] )
            (evr 4 asc 0 [(rep  "b bass15" 4)])
            (evr 3 asc 0 (fn [x] [(fst x 8)]))
@@ -923,12 +923,28 @@ d2_7sus2
            (evr 1 slw)
            )
   (->  ["b bd1" "b hh0"]
-           (rep 32))
+       (rep 32)
+       (evr 2 fst)
+       (evr 5 fst 4)
+       (evr 7 fst 8)
+       (evr 9 acc)
+       (evr 17 fst 12)
+       (evr 19 fst 16)
+       (evr 20 fst 32)
+       (evr 27 fst 64)
+
+       (evr 29 fst 128)
+       (evr 30 fst 128)
+       (evr 31 fst 128)
+       (evr 32 fst 128)
+       (evr 3 sfl))
        :in-buf ":in-trg")
 
   (trg! :smp1 :smp1e trg-fx-feedback-distortion
-        :in-noise-rate [1]
-        :in-out-select [1])
+        :in-noise-rate [0.04]
+        :in-out-select (-> [1]
+                           (rep 128)
+                           (evr 64 [0])))
 
     (volume! :smp1 0.25)
   )
@@ -976,22 +992,39 @@ d2_7sus2
 
   (trg :bow1 bowed
        :in-trg (->  [r]
-                    (rep 8)
-                    (evr 4 (rep  [(rep 0.001 4)] 2)))
-       :in-note (-> '(["n bb1"] ["n eb2"])
-                    (rep 8)
-                    (evr 8 fll 16))
+                    (rep 128)
+                    (evr 4 (rep  [(rep 0.001 4)] 2))
+                    (evr 16 [0.1])
+                    (evr 32  (rep  [(rep 0.001 4)] 2)))
+       (->  [0.01 0.01]
+                    (rep 128)
+                    (evr 4 (rep  [(rep 0.001 32)] 4)) )
+       :in-note (-> '(["n bb1"] ["n eb2"] ["n g2"])
+                    (rep 32)
+                    (evr 8 fll 16)
+                    )
+       (-> '(["n bb3"] ["n eb2"] ["n bb1"])
+           (rep 16)
+           (evr 8 fll 8)
+           )
+       (-> '(["n bb3"] ["n c2"])
+           (rep 16)
+           (evr 2 fll 8))
+       (-> '(["n eb4"] ["n bb3"])
+           (rep 16)
+           (evr 2 fll 128)
+           )
        :in-gate-select [1]
        :in-bow-slope  [0.2]
        :in-bow-offset [0.01]
-       :in-vib-freq ["f eb3"]
+       :in-vib-freq  ["f eb3"]
        :in-attack [0.01]
        :in-decay  [0.05]
        :in-sustain [5.1]
        :in-release [2.2])
 
 
-  (volume! :bow1 0.125))
+  (volume! :bow1 0.25))
 
 (play! :bow1)
 
