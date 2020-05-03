@@ -88,6 +88,9 @@
 
 (set-pattern-duration (/ 1 (* 1 0.5625)))
 
+(set-pattern-duration (/ 1 (* 1 1)))
+
+
 (set-pattern-delay 0.2)
 
 
@@ -847,23 +850,85 @@ d2_7sus2
 ;;End sf1;;;;;;;;
 ;;;;;;;;;;;;;;;;;
 
-
 (do
-
   (trg :smp1 smp)
   (pause! :smp1)
   (trg :smp1 smp
-       :in-trg (-> ["b bd4" "b hh0"]
-                   (rep 16)
-                   (evr 4 asc 1 (fn [x] [x "b ho0"]))
-                   ;;(evr 15 asc 0 (fn [x] (acc (rep "b hc1" 32))))
-                   (evr 1 fst)
-                   ;;(evr 15 asc 0 (fn [x] (acc (rep "b hc1" 64))))
-                   (evr 9 asc 1 (rep "b bass15" 1))
-                   (evr 8 slw)
-                   (evr 11 asc 3 (fll ["bhh0" "bho1"] 8))
-                   )
+       :in-trg
+       (-> ["b bd1" "b hh0"]
+           (rep 32)
+           (evr 1 fst)
+           )
+       (-> ["b bd1" "b hh0"]
+           (rep 32)
+           (evr 1 fst)
+           (evr 6 asc 0 [r "b bd1"])
+           (evr 6 asc 1 ["b sn1" r])
+           (evr 12 asc 0 fst)
+           )
+       (-> ["b bd1" "b hh0"]
+           (rep 32)
+           (evr 4 asc 1 (fn [x] [x "b ho0"]))
+           (evr 1 fst)
+           (evr 6 asc 1 (fn [x] [(fll ["b bd0" "b bass1"] 8)]))
+           (evr 9 asc 1 (rep "b bass1" 1))
+           (evr 11 asc 3 (fll ["bhh0" "bho1"] 8))
+           (evr 4 asc 0 (fn [x] [r r r x ]))
+           (evr 3 asc 1 (fn [x] [x r "bsn1" x ]))
+           )
+       (-> ["b bd1" "b hh0"]
+           (rep 32)
+           (evr 1 fst)
+           (evr 1 asc 0 [r "b bd1"] )
+           (evr 3 asc 1 [(rep "b hh0" 2)] )
+           (evr 4 asc 1 (fn [x] [x "b sn1"]))
+           (evr 13 asc 2 (rep ["b bass15"] 32))
+           (evr 8 slw)
+           (evr 4 asc 0 (fn [x] [r r r x ]))
+           (evr 3 asc 1 (fn [x] [x r "bsn1" x ]))
+           )
+        (-> ["b bd1" "b hh0"]
+           (rep 32)
+           (evr 1 asc 0 [r "b bd1"] )
+           (evr 4 asc 0 ["b bass15"])
+           (evr 3 asc 0 (fn [x] [(fst x 8)]))
+           (evr 3 asc 1 [(rep "b hh0" 2)] )
+           (evr 1 fst)
+           (evr 3 slw)
+           (evr 4 asc 0 (fn [x] [r r r x ]))
+           (evr 3 asc 1 (fn [x] [x "b bd0" "bsn1" x ]))
+           )
+  (-> ["b bd1" "b hh0"]
+           (rep 16)
+           (evr 1 asc 0 [r "b bd1"] )
+           (evr 4 asc 0 [(rep  "b bass15" 4)])
+           (evr 3 asc 0 (fn [x] [(fst x 8)]))
+           (evr 3 asc 1 [(rep "b hh2" 2)] )
+           (evr 1 fst)
+           (evr 3 slw)
+           (evr 4 asc 0 (fn [x] [r r r x ]))
+           (evr 2 asc 1 (fn [x] (fll [x "b bd0" "bsn1" x ] 6)))
+           )
+  (-> ["b bd1" "b hh0"]
+           (rep 16)
+           (evr 1 asc 0 [r "b bd1"] )
+           (evr 4 asc 0 [(rep  "b bass15" 4)])
+           (evr 3 asc 0 (fn [x] [(fst x 8)]))
+           (evr 3 asc 1 [(rep "b hh2" 2)] )
+           (evr 1 fst)
+           (evr 4 asc 0 (fn [x] [r r "bbass15" x ]))
+           (evr 2 asc 1 (fn [x] (fll [x "b bd0" "bsn1" "bsn0" ] 6)))
+           (evr 1 fst)
+           (evr 1 acc)
+           (evr 1 slw)
+           )
+  (->  ["b bd1" "b hh0"]
+           (rep 32))
        :in-buf ":in-trg")
+
+  (trg! :smp1 :smp1e trg-fx-feedback-distortion
+        :in-noise-rate [1]
+        :in-out-select [1])
 
     (volume! :smp1 0.25)
   )
