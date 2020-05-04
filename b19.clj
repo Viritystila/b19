@@ -824,7 +824,12 @@ d2_7sus2
   (pause! :sf1)
 
   (trg :sf1 simple-flute
-       :in-trg (-> [1 1 1 1]
+       :in-trg
+       (-> [1]
+           (rep 32)
+           (evr 2 (rep ["~"] 1))
+           (evr 4 fst 16))
+       (-> [1 1 1 1]
                    (rep 32)
                    (evr 4 (rep ["~"] 4)))
        (-> [1 1 1 [1 1]]
@@ -834,16 +839,20 @@ d2_7sus2
            (rep 32)
            (evr 4 (rep ["~"] 2))
            (evr 3 acc))
-       :in-freq (-> ["f bb2"]
-                    (rep 32)
-                    (evr 2 ["f eb1"])
-                    (rpl 0 ["f c1" "fg3"])
-                    (evr 6 asc 0 ["f bb2" "fbb1"]))
-        (-> ["f eb2"]
-                    (rep 32)
-                    (evr 2 ["f bb1" "feb3"])
-                    (rpl 0 ["f g2" "fc2"])
-                    (evr 6 asc 0 ["f bb2" "fbb1"]))
+       :in-freq
+       (-> ["f bb2" "f eb3"]
+           (evr 4 fst 16)
+           (rep 32))
+       (-> ["f bb2"]
+           (rep 32)
+           (evr 2 ["f eb1"])
+           (rpl 0 ["f c1" "fg3"])
+           (evr 6 asc 0 ["f bb2" "fbb1"]))
+       (-> ["f eb2"]
+           (rep 32)
+           (evr 2 ["f bb1" "feb3"])
+           (rpl 0 ["f g2" "fc2"])
+           (evr 6 asc 0 ["f bb2" "fbb1"]))
         (-> ["f eb2"]
             (rep 32)
             (evr 2 ["f bb2"])
@@ -1019,7 +1028,8 @@ d2_7sus2
                     (evr 32  (rep  [(rep 0.001 4)] 2)))
        (->  [0.01 0.01]
                     (rep 128)
-                    (evr 4 (rep  [(rep 0.001 32)] 4)) )
+                    (evr 4 (rep  [(rep 0.001 32)] 4))
+                    (evr 100 [(range 0.001 1 0.05)]))
        :in-note (-> '(["n bb1"] ["n eb2"] ["n g2"])
                     (rep 32)
                     (evr 8 fll 16)
